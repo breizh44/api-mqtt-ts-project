@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+import "common_header.proto";
+
+message Measure
+{
+    Header header = 1;
+    double value = 2;
+    Pulsed pulsed = 3;
+
+    // Type of measure should be in the MQTT Topic, but if needed,
+    //     it will be possible to add a field to a specific measure type
+    oneof type {
+        MeasureSpeed measure_speed = 4;
+        MeasureCurrent measure_current = 5;
+        MeasureVoltage measure_voltage = 6;
+    }
+
+    enum Pulsed
+    {
+        CONTINUOUS = 0;
+        PULSED_HIGH = 1;
+        PULSED_LOW = 2;
+    }
+
+    message MeasureSpeed
+    {
+    }
+
+    message MeasureCurrent
+    {
+    }
+
+    message MeasureVoltage
+    {
+    }
+}
+

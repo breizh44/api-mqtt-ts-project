@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+message Header
+{
+    uint64 timestamp = 1;
+    string version = 2;     // Protocol version
+}

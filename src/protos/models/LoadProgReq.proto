@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+message LoadProgReq {
+    uint64 timestamp = 1;
+    uint32 progId = 2;
+    string hash = 3;
+}
