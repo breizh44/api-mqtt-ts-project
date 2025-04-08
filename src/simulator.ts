@@ -20,6 +20,8 @@ simulator.on("connect", () => {
   //   console.log(`📤 Mesure envoyée : ${value}`);
   // }, 10_000);
 
+  // Publication périodique d'une mesure toutes les 10 secondes
+  // avec un message Protobuf
   setInterval(() => {
     const timestamp = Date.now();
     const value = Math.random() * 25;

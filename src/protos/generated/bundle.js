@@ -1693,4 +1693,231 @@ $root.Measure = (function() {
     return Measure;
 })();
 
+$root.RequestResponse = (function() {
+
+    /**
+     * Properties of a RequestResponse.
+     * @exports IRequestResponse
+     * @interface IRequestResponse
+     * @property {string|null} [status] RequestResponse status
+     * @property {string|null} [message] RequestResponse message
+     */
+
+    /**
+     * Constructs a new RequestResponse.
+     * @exports RequestResponse
+     * @classdesc Represents a RequestResponse.
+     * @implements IRequestResponse
+     * @constructor
+     * @param {IRequestResponse=} [properties] Properties to set
+     */
+    function RequestResponse(properties) {
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * RequestResponse status.
+     * @member {string} status
+     * @memberof RequestResponse
+     * @instance
+     */
+    RequestResponse.prototype.status = "";
+
+    /**
+     * RequestResponse message.
+     * @member {string} message
+     * @memberof RequestResponse
+     * @instance
+     */
+    RequestResponse.prototype.message = "";
+
+    /**
+     * Creates a new RequestResponse instance using the specified properties.
+     * @function create
+     * @memberof RequestResponse
+     * @static
+     * @param {IRequestResponse=} [properties] Properties to set
+     * @returns {RequestResponse} RequestResponse instance
+     */
+    RequestResponse.create = function create(properties) {
+        return new RequestResponse(properties);
+    };
+
+    /**
+     * Encodes the specified RequestResponse message. Does not implicitly {@link RequestResponse.verify|verify} messages.
+     * @function encode
+     * @memberof RequestResponse
+     * @static
+     * @param {IRequestResponse} message RequestResponse message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    RequestResponse.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.status != null && Object.hasOwnProperty.call(message, "status"))
+            writer.uint32(/* id 1, wireType 2 =*/10).string(message.status);
+        if (message.message != null && Object.hasOwnProperty.call(message, "message"))
+            writer.uint32(/* id 2, wireType 2 =*/18).string(message.message);
+        return writer;
+    };
+
+    /**
+     * Encodes the specified RequestResponse message, length delimited. Does not implicitly {@link RequestResponse.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof RequestResponse
+     * @static
+     * @param {IRequestResponse} message RequestResponse message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    RequestResponse.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes a RequestResponse message from the specified reader or buffer.
+     * @function decode
+     * @memberof RequestResponse
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {RequestResponse} RequestResponse
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    RequestResponse.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.RequestResponse();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1: {
+                    message.status = reader.string();
+                    break;
+                }
+            case 2: {
+                    message.message = reader.string();
+                    break;
+                }
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes a RequestResponse message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof RequestResponse
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {RequestResponse} RequestResponse
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    RequestResponse.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies a RequestResponse message.
+     * @function verify
+     * @memberof RequestResponse
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    RequestResponse.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message.status != null && message.hasOwnProperty("status"))
+            if (!$util.isString(message.status))
+                return "status: string expected";
+        if (message.message != null && message.hasOwnProperty("message"))
+            if (!$util.isString(message.message))
+                return "message: string expected";
+        return null;
+    };
+
+    /**
+     * Creates a RequestResponse message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof RequestResponse
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {RequestResponse} RequestResponse
+     */
+    RequestResponse.fromObject = function fromObject(object) {
+        if (object instanceof $root.RequestResponse)
+            return object;
+        var message = new $root.RequestResponse();
+        if (object.status != null)
+            message.status = String(object.status);
+        if (object.message != null)
+            message.message = String(object.message);
+        return message;
+    };
+
+    /**
+     * Creates a plain object from a RequestResponse message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof RequestResponse
+     * @static
+     * @param {RequestResponse} message RequestResponse
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    RequestResponse.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.defaults) {
+            object.status = "";
+            object.message = "";
+        }
+        if (message.status != null && message.hasOwnProperty("status"))
+            object.status = message.status;
+        if (message.message != null && message.hasOwnProperty("message"))
+            object.message = message.message;
+        return object;
+    };
+
+    /**
+     * Converts this RequestResponse to JSON.
+     * @function toJSON
+     * @memberof RequestResponse
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    RequestResponse.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    /**
+     * Gets the default type url for RequestResponse
+     * @function getTypeUrl
+     * @memberof RequestResponse
+     * @static
+     * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+     * @returns {string} The default type url
+     */
+    RequestResponse.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        if (typeUrlPrefix === undefined) {
+            typeUrlPrefix = "type.googleapis.com";
+        }
+        return typeUrlPrefix + "/RequestResponse";
+    };
+
+    return RequestResponse;
+})();
+
 module.exports = $root;

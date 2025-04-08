@@ -727,3 +727,106 @@ export namespace Measure {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 }
+
+/** Properties of a RequestResponse. */
+export interface IRequestResponse {
+
+    /** RequestResponse status */
+    status?: (string|null);
+
+    /** RequestResponse message */
+    message?: (string|null);
+}
+
+/** Represents a RequestResponse. */
+export class RequestResponse implements IRequestResponse {
+
+    /**
+     * Constructs a new RequestResponse.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: IRequestResponse);
+
+    /** RequestResponse status. */
+    public status: string;
+
+    /** RequestResponse message. */
+    public message: string;
+
+    /**
+     * Creates a new RequestResponse instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns RequestResponse instance
+     */
+    public static create(properties?: IRequestResponse): RequestResponse;
+
+    /**
+     * Encodes the specified RequestResponse message. Does not implicitly {@link RequestResponse.verify|verify} messages.
+     * @param message RequestResponse message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(message: IRequestResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Encodes the specified RequestResponse message, length delimited. Does not implicitly {@link RequestResponse.verify|verify} messages.
+     * @param message RequestResponse message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(message: IRequestResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Decodes a RequestResponse message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns RequestResponse
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): RequestResponse;
+
+    /**
+     * Decodes a RequestResponse message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns RequestResponse
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): RequestResponse;
+
+    /**
+     * Verifies a RequestResponse message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): (string|null);
+
+    /**
+     * Creates a RequestResponse message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns RequestResponse
+     */
+    public static fromObject(object: { [k: string]: any }): RequestResponse;
+
+    /**
+     * Creates a plain object from a RequestResponse message. Also converts values to other types if specified.
+     * @param message RequestResponse
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(message: RequestResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+    /**
+     * Converts this RequestResponse to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+
+    /**
+     * Gets the default type url for RequestResponse
+     * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+     * @returns The default type url
+     */
+    public static getTypeUrl(typeUrlPrefix?: string): string;
+}

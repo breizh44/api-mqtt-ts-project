@@ -26,6 +26,9 @@ client.on("connect", () => {
 });
 
 client.on("message", (topic, payload, packet) => {
+  const msg = payload.toString();
+  const correlationData = packet.properties?.correlationData?.toString("hex");
+
   if (topic === "/measure/current") {
     try {
       // Décoder le message Protobuf
@@ -47,46 +50,68 @@ client.on("message", (topic, payload, packet) => {
     } catch (err) {
       console.error("Erreur de décodage du message Protobuf : ", err);
     }
+    return;
   }
-  // if (topic === "/measure/current") {
-  //   console.log("📏 Mesure reçue :", msg);
-  //   return;
-  // }
 
-  const msg = payload.toString();
-  const correlationData = packet.properties?.correlationData?.toString("hex");
-  if (!correlationData) return;
+  if (!correlationData) {
+    console.warn(
+      `📨 Réponse MQTT sans correlationData reçue sur ${topic} ← ${msg}`
+    );
+    return;
+  }
 
   const handler = pendingResponses.get(correlationData);
-  if (handler) {
-    handler(msg);
-    console.log(`📨 Réponse reçue sur ${topic}:`, msg);
-    pendingResponses.delete(correlationData);
+  if (!handler) {
+    console.warn(
+      `⚠️ [${correlationData}] Réponse inattendue sur ${topic} (probablement timeout)`
+    );
+    return;
   }
+
+  // Appeler le gestionnaire de réponse avec le message reçu
+  handler(msg);
+  console.log(`📨 Réponse reçue sur ${topic}:`, msg);
+  pendingResponses.delete(correlationData);
 });
 
 function sendMqttRequest(
   topic: string,
   responseTopic: string,
-  payload: any
+  payload: any,
+  timeoutMs = 5000
 ): Promise<string> {
   const correlationId = randomUUID().replace(/-/g, "");
+  const correlationHex = correlationId;
+  const correlationBuffer = Buffer.from(correlationHex, "hex");
 
   const options: IClientPublishOptions = {
     qos: 1,
     properties: {
       responseTopic,
-      correlationData: Buffer.from(correlationId, "hex"),
+      correlationData: correlationBuffer,
     },
   };
 
   return new Promise((resolve, reject) => {
-    pendingResponses.set(correlationId, resolve);
+    console.log(`📤 [${correlationHex}] Envoi sur ${topic} →`, payload);
+
+    pendingResponses.set(correlationHex, (msg: string) => {
+      console.log(
+        `✅ [${correlationHex}] Réponse reçue sur ${responseTopic} ←`,
+        msg
+      );
+      resolve(msg);
+    });
+
     client.publish(topic, JSON.stringify(payload), options);
+
     setTimeout(() => {
-      pendingResponses.delete(correlationId);
-      reject(new Error("Timeout"));
-    }, 5000);
+      if (pendingResponses.has(correlationHex)) {
+        console.warn(`⏱️ [${correlationHex}] Timeout sur ${responseTopic}`);
+        pendingResponses.delete(correlationHex);
+        reject(new Error("Timeout"));
+      }
+    }, timeoutMs);
   });
 }
 
