@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { IClientPublishOptions } from "mqtt";
 import { createMqttClient } from "./mqttClient";
 import dotenv from "dotenv";
-import { Measure } from "./protos/generated/bundle";
+import { Measure, RequestResponse } from "./protos/generated/bundle";
 
 dotenv.config();
 
@@ -79,7 +79,7 @@ function sendMqttRequest(
   responseTopic: string,
   payload: any,
   timeoutMs = 5000
-): Promise<string> {
+): Promise<RequestResponse> {
   const correlationId = randomUUID().replace(/-/g, "");
   const correlationHex = correlationId;
   const correlationBuffer = Buffer.from(correlationHex, "hex");
@@ -95,12 +95,21 @@ function sendMqttRequest(
   return new Promise((resolve, reject) => {
     console.log(`📤 [${correlationHex}] Envoi sur ${topic} →`, payload);
 
-    pendingResponses.set(correlationHex, (msg: string) => {
-      console.log(
-        `✅ [${correlationHex}] Réponse reçue sur ${responseTopic} ←`,
-        msg
-      );
-      resolve(msg);
+    pendingResponses.set(correlationHex, (rawMsg: Buffer | string) => {
+      try {
+        const buffer =
+          typeof rawMsg === "string" ? Buffer.from(rawMsg) : rawMsg;
+
+        const response = RequestResponse.decode(buffer);
+        console.log(`✅ [${correlationHex}] Protobuf décodé ←`, response);
+        resolve(response);
+      } catch (err) {
+        console.error(
+          `❌ [${correlationHex}] Erreur de décodage Protobuf :`,
+          err
+        );
+        reject(new Error("Invalid protobuf response"));
+      }
     });
 
     client.publish(topic, JSON.stringify(payload), options);
@@ -122,9 +131,15 @@ app.post("/welding/start", async (_, res) => {
       "welding/start/response",
       { command: "start" }
     );
-    res.json({ success: true, response: result });
-  } catch {
-    res.status(504).json({ success: false, error: "Timeout" });
+    res.json({ success: result.status === "OK", ...result });
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(504).json({ success: false, error: err.message });
+    } else {
+      res
+        .status(504)
+        .json({ success: false, error: "An unknown error occurred" });
+    }
   }
 });
 
@@ -136,8 +151,14 @@ app.post("/welding/stop", async (_, res) => {
       { command: "stop" }
     );
     res.json({ success: true, response: result });
-  } catch {
-    res.status(504).json({ success: false, error: "Timeout" });
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(504).json({ success: false, error: err.message });
+    } else {
+      res
+        .status(504)
+        .json({ success: false, error: "An unknown error occurred" });
+    }
   }
 });
 
@@ -150,8 +171,14 @@ app.delete("/wp/:wpId/delete", async (req, res) => {
       { action: "delete", wpId }
     );
     res.json({ success: true, response: result });
-  } catch {
-    res.status(504).json({ success: false, error: "Timeout" });
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(504).json({ success: false, error: err.message });
+    } else {
+      res
+        .status(504)
+        .json({ success: false, error: "An unknown error occurred" });
+    }
   }
 });
 

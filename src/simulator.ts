@@ -1,6 +1,6 @@
 import { createMqttClient } from "./mqttClient";
 import dotenv from "dotenv";
-import { Measure } from "./protos/generated/bundle";
+import { Measure, RequestResponse } from "./protos/generated/bundle";
 
 dotenv.config();
 
@@ -56,20 +56,34 @@ simulator.on("message", (topic, payload, packet) => {
   const msg = payload.toString();
   console.log(`📨 Reçu sur ${topic}:`, msg);
 
-  let responseMsg = "";
+  // Simule une erreur aléatoire
+  const isError = Math.random() < 0.25; // 25% de chance d'erreur
+
+  let status = isError ? "KO" : "OK";
+  let message = "";
+
   if (topic === "welding/start/request") {
-    responseMsg = "Soudage démarré";
+    message = "Soudage démarré";
   } else if (topic === "welding/stop/request") {
-    responseMsg = "Soudage arrêté";
+    message = "Soudage arrêté";
   } else if (topic.startsWith("wp/")) {
     const wpId = topic.split("/")[1];
-    responseMsg = `MOS supprimé: ${wpId}`;
+    message = `MOS supprimé: ${wpId}`;
+  } else {
+    status = "KO";
+    message = "Commande inconnue";
   }
 
-  simulator.publish(responseTopic, responseMsg, {
+  // Créer la réponse Protobuf
+  const response = RequestResponse.create({ status, message });
+  const responseBuffer = RequestResponse.encode(response).finish();
+
+  simulator.publish(responseTopic, Buffer.from(responseBuffer), {
     qos: 1,
     properties: {
       correlationData,
     },
   });
+
+  console.log(`📤 Réponse envoyée : ${status} - ${message}`);
 });
