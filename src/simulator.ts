@@ -45,8 +45,37 @@ simulator.on("connect", () => {
     // Affichage lisible de la date
     const dateString = new Date(timestamp).toLocaleString("fr-FR");
     console.log(`📤 Mesure envoyée : ${value.toFixed(2)} A à ${dateString}`);
-  }, 10_000);
+    //}, 10_000); // 10 secondes
+    //}, 30_000); // 30 secondes
+  }, 500); // 500ms pour simuler une mesure continue
 });
+
+// Envoi de mesure de vitesse toutes les 500ms
+setInterval(() => {
+  const timestamp = Date.now();
+  const value = Math.random() * 100; // Valeur de vitesse entre 0 et 100
+
+  const measure = Measure.create({
+    header: {
+      timestamp,
+      version: "1.0.0",
+    },
+    value,
+    pulsed: Measure.Pulsed.CONTINUOUS,
+    measureSpeed: Measure.MeasureSpeed.create(), // Mesure de vitesse vide
+  });
+
+  const messageBuffer = Measure.encode(measure).finish();
+
+  simulator.publish("/measure/speed", Buffer.from(messageBuffer), {
+    qos: 1,
+  });
+
+  const dateString = new Date(timestamp).toLocaleString("fr-FR");
+  console.log(
+    `📤 Mesure de vitesse envoyée : ${value.toFixed(2)} mm/s à ${dateString}`
+  );
+}, 500); // 500ms pour simuler une mesure continue
 
 simulator.on("message", (topic, payload, packet) => {
   const responseTopic = packet.properties?.responseTopic;
